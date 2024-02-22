@@ -1,0 +1,119 @@
+execve("./bin/dynamicMain", ["./bin/dynamicMain"], 0x7fff761b7cd0 /* 72 vars */) = 0
+brk(NULL)                               = 0x5568b434b000
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ffb698f1000
+newfstatat(AT_FDCWD, "/home/pasha/Study/OS/lab4/build", {st_mode=S_IFDIR|0775, st_size=4096, ...}, 0) = 0
+openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=106823, ...}, AT_EMPTY_PATH) = 0
+mmap(NULL, 106823, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7ffb698d6000
+close(3)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=2260296, ...}, AT_EMPTY_PATH) = 0
+mmap(NULL, 2275520, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7ffb696aa000
+mprotect(0x7ffb69744000, 1576960, PROT_NONE) = 0
+mmap(0x7ffb69744000, 1118208, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x9a000) = 0x7ffb69744000
+mmap(0x7ffb69855000, 454656, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1ab000) = 0x7ffb69855000
+mmap(0x7ffb698c5000, 57344, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x21a000) = 0x7ffb698c5000
+mmap(0x7ffb698d3000, 10432, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7ffb698d3000
+close(3)                                = 0
+openat(AT_FDCWD, "/home/pasha/Study/OS/lab4/build/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\237\2\0\0\0\0\0"..., 832) = 832
+pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784
+pread64(3, "\4\0\0\0 \0\0\0\5\0\0\0GNU\0\2\0\0\300\4\0\0\0\3\0\0\0\0\0\0\0"..., 48, 848) = 48
+pread64(3, "\4\0\0\0\24\0\0\0\3\0\0\0GNU\0i8\235HZ\227\223\333\350s\360\352,\223\340."..., 68, 896) = 68
+newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=2216304, ...}, AT_EMPTY_PATH) = 0
+pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784
+mmap(NULL, 2260560, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7ffb69482000
+mmap(0x7ffb694aa000, 1658880, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x28000) = 0x7ffb694aa000
+mmap(0x7ffb6963f000, 360448, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1bd000) = 0x7ffb6963f000
+mmap(0x7ffb69697000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x214000) = 0x7ffb69697000
+mmap(0x7ffb6969d000, 52816, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7ffb6969d000
+close(3)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libm.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=940560, ...}, AT_EMPTY_PATH) = 0
+mmap(NULL, 942344, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7ffb6939b000
+mmap(0x7ffb693a9000, 507904, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xe000) = 0x7ffb693a9000
+mmap(0x7ffb69425000, 372736, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x8a000) = 0x7ffb69425000
+mmap(0x7ffb69480000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xe4000) = 0x7ffb69480000
+close(3)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=125488, ...}, AT_EMPTY_PATH) = 0
+mmap(NULL, 127720, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7ffb6937b000
+mmap(0x7ffb6937e000, 94208, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x3000) = 0x7ffb6937e000
+mmap(0x7ffb69395000, 16384, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1a000) = 0x7ffb69395000
+mmap(0x7ffb69399000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1d000) = 0x7ffb69399000
+close(3)                                = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ffb69379000
+mmap(NULL, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7ffb69376000
+arch_prctl(ARCH_SET_FS, 0x7ffb69376740) = 0
+set_tid_address(0x7ffb69376a10)         = 16981
+set_robust_list(0x7ffb69376a20, 24)     = 0
+rseq(0x7ffb693770e0, 0x20, 0, 0x53053053) = 0
+mprotect(0x7ffb69697000, 16384, PROT_READ) = 0
+mprotect(0x7ffb69399000, 4096, PROT_READ) = 0
+mprotect(0x7ffb69480000, 4096, PROT_READ) = 0
+mprotect(0x7ffb698c5000, 45056, PROT_READ) = 0
+mprotect(0x5568b2da0000, 4096, PROT_READ) = 0
+mprotect(0x7ffb6992b000, 8192, PROT_READ) = 0
+prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0
+munmap(0x7ffb698d6000, 106823)          = 0
+getrandom("\x7c\xf8\x27\x99\xff\xec\x33\x35", 8, GRND_NONBLOCK) = 8
+brk(NULL)                               = 0x5568b434b000
+brk(0x5568b436c000)                     = 0x5568b436c000
+futex(0x7ffb698d377c, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+newfstatat(0, "", {st_mode=S_IFCHR|0620, st_rdev=makedev(0x88, 0), ...}, AT_EMPTY_PATH) = 0
+read(0, 1
+"1\n", 1024)                    = 2
+openat(AT_FDCWD, "./build/libfunction1.so", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+newfstatat(3, "", {st_mode=S_IFREG|0775, st_size=26064, ...}, AT_EMPTY_PATH) = 0
+getcwd("/home/pasha/Study/OS/lab4", 128) = 26
+mmap(NULL, 16432, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7ffb698ec000
+mmap(0x7ffb698ed000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x7ffb698ed000
+mmap(0x7ffb698ee000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7ffb698ee000
+mmap(0x7ffb698ef000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7ffb698ef000
+close(3)                                = 0
+mprotect(0x7ffb698ef000, 4096, PROT_READ) = 0
+read(0, 1 2
+"1 2\n", 1024)                  = 4
+newfstatat(1, "", {st_mode=S_IFCHR|0620, st_rdev=makedev(0x88, 0), ...}, AT_EMPTY_PATH) = 0
+write(1, "-0.765147\n", 10-0.765147
+)             = 10
+read(0, 2
+"2\n", 1024)                    = 2
+read(0, 2 3
+"2 3\n", 1024)                  = 4
+write(1, "6\n", 26
+)                      = 2
+read(0, 0
+"0\n", 1024)                    = 2
+openat(AT_FDCWD, "./build/libfunction2.so", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+newfstatat(3, "", {st_mode=S_IFREG|0775, st_size=26144, ...}, AT_EMPTY_PATH) = 0
+getcwd("/home/pasha/Study/OS/lab4", 128) = 26
+mmap(NULL, 16432, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7ffb698e7000
+mmap(0x7ffb698e8000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x7ffb698e8000
+mmap(0x7ffb698e9000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7ffb698e9000
+mmap(0x7ffb698ea000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7ffb698ea000
+close(3)                                = 0
+mprotect(0x7ffb698ea000, 4096, PROT_READ) = 0
+read(0, 1 2
+"1 2\n", 1024)                  = 4
+read(0, 2
+"2\n", 1024)                    = 2
+write(1, "-0.413411\n", 10-0.413411
+)             = 10
+read(0, 2
+"2\n", 1024)                    = 2
+read(0, 2 3
+"2 3\n", 1024)                  = 4
+write(1, "3\n", 23
+)                      = 2
+read(0, "", 1024)                       = 0
+munmap(0x7ffb698ec000, 16432)           = 0
+munmap(0x7ffb698e7000, 16432)           = 0
+exit_group(0)                           = ?
++++ exited with 0 +++

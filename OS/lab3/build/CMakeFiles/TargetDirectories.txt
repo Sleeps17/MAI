@@ -1,0 +1,4 @@
+/home/pasha/Study/OS/lab3/build/CMakeFiles/main.dir
+/home/pasha/Study/OS/lab3/build/CMakeFiles/child_process.dir
+/home/pasha/Study/OS/lab3/build/CMakeFiles/edit_cache.dir
+/home/pasha/Study/OS/lab3/build/CMakeFiles/rebuild_cache.dir

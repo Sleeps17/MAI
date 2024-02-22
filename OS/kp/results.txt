@@ -1,0 +1,63 @@
+Random Allocation:
+FreeListsAllocator:
+Time taken by function: 433 microseconds
+Peak memory usage: 218991 bytes
+Binary Allocator:
+Time taken by function: 42951 microseconds
+Peak memory usage: 239073 bytes
+
+Random Deallocation:
+FreeListsAllocator:
+Time taken by function: 124008 microseconds
+Peak memory usage: 259776 bytes
+Binary Allocator:
+Time taken by function: 119694 microseconds
+Peak memory usage: 234987 bytes
+
+Ordered Allocation:
+FreeListsAllocator:
+Time taken by function: 246 microseconds
+Peak memory usage: 829500 bytes
+Binary Allocator:
+Time taken by function: 349 microseconds
+Peak memory usage: 819100 bytes
+
+Ordered Deallocation:
+FreeListsAllocator:
+Time taken by function: 3372 microseconds
+Peak memory usage: 842432 bytes
+Binary Allocator:
+Time taken by function: 1959 microseconds
+Peak memory usage: 819100 bytes
+
+Random Allocation:
+FreeListsAllocator:
+Time taken by function: 356 microseconds
+Peak memory usage: 186412 bytes
+Binary Allocator:
+Time taken by function: 32272 microseconds
+Peak memory usage: 203201 bytes
+
+Random Deallocation:
+FreeListsAllocator:
+Time taken by function: 166099 microseconds
+Peak memory usage: 293010 bytes
+Binary Allocator:
+Time taken by function: 163928 microseconds
+Peak memory usage: 267272 bytes
+
+Ordered Allocation:
+FreeListsAllocator:
+Time taken by function: 259 microseconds
+Peak memory usage: 829500 bytes
+Binary Allocator:
+Time taken by function: 411 microseconds
+Peak memory usage: 819100 bytes
+
+Ordered Deallocation:
+FreeListsAllocator:
+Time taken by function: 3626 microseconds
+Peak memory usage: 842432 bytes
+Binary Allocator:
+Time taken by function: 2149 microseconds
+Peak memory usage: 819100 bytes
