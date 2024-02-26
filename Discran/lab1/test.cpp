@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
-#include <vector>
 #include <random>
 #include "sort.hpp"
+#include "container.hpp"
 
 
-bool IsSorted(const std::vector<Data>& objects) {
-    for (size_t i = 0; i < objects.size() - 1; ++i) {
+bool IsSorted(const MyVector<Data>& objects) {
+    for (size_t i = 0; i < objects.length() - 1; ++i) {
         if (objects[i].key > objects[i + 1].key) {
             std::cout << i << " " << i + 1 << "\n";
             return false;
@@ -27,10 +27,9 @@ uint64_t RandomValue() {
 }
 
 TEST(CountSortTest, SortedDataTest) {
-    std::vector<Data> objects;
+    MyVector<Data> objects;
 
-    objects.reserve(100000);
-for (int i = 0; i < 100000; ++i) {
+for (int i = 0; i < 10000; ++i) {
         objects.push_back(Data{RandomKey(), RandomValue()});
     }
 

@@ -1,13 +1,13 @@
 #include <iostream>
-#include <vector>
 #include "sort.hpp"
+#include "container.hpp"
 
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     std::cout.tie(nullptr);
 
-    std::vector<Data> objects;
+    MyVector<Data> objects;
     uint16_t key;
     uint64_t value;
 
