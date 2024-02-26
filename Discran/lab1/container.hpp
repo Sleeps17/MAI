@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 template <typename T>
 class MyVector final {
 
@@ -10,7 +8,7 @@ class MyVector final {
   private:
     size_t size{};
     size_t cap{};
-    std::shared_ptr<T[]> arr{};
+    T* arr{};
 
     void expand(size_t newCap);
 
@@ -24,7 +22,7 @@ class MyVector final {
     MyVector(MyVector<T>&& other) noexcept;
     MyVector<T>& operator=(const MyVector& other);
     MyVector<T>& operator=(MyVector<T>&& other) noexcept;
-    ~MyVector() = default;
+    ~MyVector();
 
 	void push_back(const T& elem);
     void pop_back();
@@ -39,35 +37,35 @@ class MyVector final {
     [[nodiscard]] T* end() const noexcept;
 };
 
-template<class T>  
+template<class T>
 void MyVector<T>::expand(size_t newCap) {
-    std::shared_ptr<T[]> newArr;
-
     if(newCap <= cap) {
-    return;
+        return;
     }
 
-    newArr = std::shared_ptr<T[]>(new T[newCap]);
+    T* tmp = arr;
+    arr = new T[newCap];
     for(size_t i = 0; i < size; ++i) {
-        newArr[i] = arr[i];
+        arr[i] = tmp[i];
     }
 
-    arr = newArr;
+    delete[] tmp;
+
     cap = newCap;
-}   
+}
 
 template<class T> 
-MyVector<T>::MyVector(size_t _size, T value): size(_size), cap(size), arr(std::shared_ptr<T[]>(new T[cap])) {
+MyVector<T>::MyVector(size_t _size, T value): size(_size), cap(size), arr(new T[cap]) {
     for(int i = 0; i < size; ++i) {
         arr[i] = value;
     }
 }
 
 template<class T> 
-MyVector<T>::MyVector(size_t _size): size(_size), cap(size > 0 ? 2*size : defaultCapacity), arr(std::shared_ptr<T[]>(new T[cap])) {}
+MyVector<T>::MyVector(size_t _size): size(_size), cap(size > 0 ? 2*size : defaultCapacity), arr(new T[cap]) {}
 
 template <class T> 
-MyVector<T>::MyVector(const std::initializer_list<T>& list): size(list.size()), cap(size > 0 ? 2*size : defaultCapacity), arr(std::shared_ptr<T[]>(new T[cap])) {
+MyVector<T>::MyVector(const std::initializer_list<T>& list): size(list.size()), cap(size > 0 ? 2*size : defaultCapacity), arr(new T[cap]) {
     int i = 0;
     for(const T& elem : list) {
         arr[i++] = elem;
@@ -76,7 +74,7 @@ MyVector<T>::MyVector(const std::initializer_list<T>& list): size(list.size()), 
 
 // Правило пяти
 template <class T> 
-MyVector<T>::MyVector(const MyVector<T>& other): size(other.size), cap(other.cap), arr(std::shared_ptr<T[]>(new T[cap])) {
+MyVector<T>::MyVector(const MyVector<T>& other): size(other.size), cap(other.cap), arr(new T[cap]) {
     for(int i = 0; i < size; ++i) {
         arr[i] = other[i];
     }
@@ -91,9 +89,12 @@ MyVector<T>::MyVector(MyVector<T>&& other) noexcept : size(other.size), cap(othe
 
 template <class T>
 MyVector<T>& MyVector<T>::operator=(const MyVector& other){
+    if(this == &other) {
+        return *this;
+    }
     size = other.size;
     cap = other.cap;
-    arr = std::shared_ptr<T[]>(new T[cap]);
+    arr = new T[cap];
     for(int i = 0; i < size; ++i) {
         arr[i] = other[i];
     }
@@ -110,6 +111,11 @@ MyVector<T>& MyVector<T>::operator=(MyVector<T>&& other) noexcept {
     other.size = 0;
     other.cap = 0;
     return *this;
+}
+
+template <class T>
+MyVector<T>::~MyVector() {
+    delete[] arr;
 }
 
 // Методы
@@ -189,10 +195,10 @@ T& MyVector<T>::operator[](size_t index) const  {
 // Для итераторов
 template <class T> 
 T* MyVector<T>::begin() const noexcept  {
-    return arr.get();
+    return arr;
 }
 
 template <class T> 
 T* MyVector<T>::end() const noexcept  {
-    return arr.get() + size;
+    return arr + size;
 }

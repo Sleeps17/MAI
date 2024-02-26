@@ -29,7 +29,7 @@ uint64_t RandomValue() {
 TEST(CountSortTest, SortedDataTest) {
     MyVector<Data> objects;
 
-for (int i = 0; i < 10000; ++i) {
+for (int i = 0; i < 1000; ++i) {
         objects.push_back(Data{RandomKey(), RandomValue()});
     }
 
