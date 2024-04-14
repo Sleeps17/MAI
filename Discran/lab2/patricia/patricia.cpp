@@ -1,16 +1,27 @@
 #include "patricia.hpp"
 #include <cstring>
 #include <iostream>
+#include <fstream>
 
 struct Patricia::Node {
-    std::string key;
-    uint64_t value;
-    size_t index;
-    Node* left;
-    Node* right;
+    std::string key{};
+    uint64_t value{};
+    size_t index{};
+    int64_t priority{};
+    Node* left{};
+    Node* right{};
+
+    Node() = default;
 
     Node(std::string  key, const uint64_t& value, const size_t& index)
-            : key(std::move(key)), value(value), index(index), left(nullptr), right(nullptr) {}
+            : key(std::move(key)), value(value), index(index), left(nullptr), right(nullptr) {
+        priority = -1;
+    }
+
+    Node(std::string key, const uint64_t& value, const size_t& index, Node* left, Node* right)
+            : key(std::move(key)), value(value), index(index), left(left), right(right) {
+        priority = -1;
+    }
 
     ~Node()= default;
 };
@@ -19,6 +30,7 @@ void Patricia::add(const std::string& key, const uint64_t& value) {
     if (root == nullptr) {
         root = new Node(key, value, 0);
         root->left = root;
+        elements_count++;
         return;
     }
 
@@ -46,23 +58,26 @@ void Patricia::add(const std::string& key, const uint64_t& value) {
         }
         ++char_idx;
     }
+
+    elements_count++;
 }
 
 void Patricia::erase(const std::string& key) {
     if (!root) {
-        return;
+        throw std::runtime_error("no such word");
     }
 
     Node** triple = triple_search(key);
     Node* delete_node = triple[0], *owner_node = triple[1], *parent_node = triple[2];
 
-    if (delete_node->key == key) {
+    if (delete_node->key != key) {
         throw std::runtime_error("no such word");
     }
 
     if (delete_node == root && root->left == root) {
         delete root;
         root = nullptr;
+        elements_count--;
         return;
     }
 
@@ -131,6 +146,8 @@ void Patricia::erase(const std::string& key) {
     delete triple;
     delete owner_triple;
     delete owner_node;
+
+    elements_count--;
 }
 
 uint64_t Patricia::at(const std::string& key) const {
@@ -156,11 +173,85 @@ void Patricia::clear() {
     }
 
     delete root;
+    elements_count = 0;
     root = nullptr;
 }
 
 Patricia::~Patricia() {
     clear();
+}
+
+void Patricia::save(std::ofstream& f) const {
+    f.write(reinterpret_cast<const char*>(&elements_count), sizeof(size_t));
+
+    Node* arr[elements_count+1];
+    int64_t priority = 0;
+    count_elements(root, arr, priority);
+
+    for (size_t i = 0; i <= elements_count; ++i) {
+        f.write(reinterpret_cast<const char*>(&arr[i]->value), sizeof(int64_t));
+        f.write(reinterpret_cast<const char*>(&arr[i]->index), sizeof(size_t));
+        size_t length = 0;
+        if (arr[i] != nullptr) {
+            length = arr[i]->key.length();
+        }
+
+        f.write(reinterpret_cast<const char*>(&length), sizeof(size_t));
+        f.write(arr[i]->key.c_str(), long(length*sizeof(char)));
+        size_t left_priority = -1;
+        if (arr[i] != nullptr && arr[i]->left != nullptr) {
+            left_priority = arr[i]->left->priority;
+        }
+        f.write(reinterpret_cast<const char*>(&left_priority), sizeof(size_t));
+        size_t right_priority = -1;
+        if (arr[i] != nullptr && arr[i]->right != nullptr) {
+            right_priority = arr[i]->right->priority;
+        }
+        f.write(reinterpret_cast<const char*>(&right_priority), sizeof(size_t));
+    }
+}
+
+void Patricia::load(std::ifstream& f) {
+    this->clear();
+
+    size_t count = 0;
+    f.read(reinterpret_cast<char*>(&count), sizeof(size_t));
+
+    if (count == 0) {
+        return;
+    }
+
+    elements_count = count;
+
+    Node* arr[elements_count+1];
+    for (size_t i = 0; i <= elements_count; ++i) {
+        arr[i] = new Node();
+    }
+
+    std::string key;
+    size_t value, index, length;
+    int64_t left_priority = -1, right_priority = -1;
+    for(size_t i = 0; i <= elements_count; ++i) {
+        f.read(reinterpret_cast<char*>(&value), sizeof(int64_t));
+        f.read(reinterpret_cast<char*>(&index), sizeof(size_t));
+        f.read(reinterpret_cast<char*>(&length), sizeof(size_t));
+        key.resize(length);
+        f.read(key.data(), long(length*sizeof(char)));
+        f.read(reinterpret_cast<char*>(&left_priority), sizeof(size_t));
+        f.read(reinterpret_cast<char*>(&right_priority), sizeof(size_t));
+        *arr[i] = Node(key, value, index, left_priority >= 0 ? arr[left_priority] : nullptr, right_priority >= 0 ? arr[right_priority] : nullptr);
+    }
+}
+
+std::ostream &operator<<(std::ostream &os, const Patricia &tree) {
+    if (tree.root == nullptr) {
+        return os;
+    }
+
+    os << '\t'  << "[ " << tree.root->index << ' ' << tree.root->key << ' ' << tree.root->value << " ]" << '\n';
+    tree.print(os, tree.root->left, tree.root->index);
+
+    return os;
 }
 
 Patricia::Node* Patricia::search(const std::string& findKey) const {
@@ -265,6 +356,10 @@ Patricia::Node** Patricia::triple_search(const std::string& findKey) const {
 }
 
 void Patricia::clear_node(Patricia::Node *node) {
+    if (node == nullptr) {
+        return;
+    }
+
     if(node->left->index > node->index) {
         clear_node(node->left);
     }
@@ -275,4 +370,28 @@ void Patricia::clear_node(Patricia::Node *node) {
     delete node;
 }
 
+void Patricia::count_elements(Patricia::Node* _root, Patricia::Node **arr, int64_t &priority) const {
+    if (_root == nullptr) {
+        return;
+    }
 
+    _root->priority = priority;
+    arr[priority++] = _root;
+
+    if (_root->left != nullptr && _root->left->index > _root->index) {
+        count_elements(_root->left, arr, priority);
+    }
+
+    if (_root->right != nullptr && _root->right->index > _root->index) {
+        count_elements(_root->right, arr, priority);
+    }
+}
+
+void Patricia::print(std::ostream& os, Patricia::Node *node, const size_t &prev_index) const {
+    if(node->index <= prev_index)
+        return;
+
+    os << '\t'  << "[ " << node->index << ' ' << node->key << ' ' << node->value << " ]" << '\n';
+    print(os, node->left, node->index);
+    print(os, node->right, node->index);
+}

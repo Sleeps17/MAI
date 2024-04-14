@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "patricia/patricia.hpp"
 
 void to_lower_case(std::string& str) {
@@ -8,12 +9,12 @@ void to_lower_case(std::string& str) {
 }
 
 int main() {
-    std::string cmd;
+    std::string input;
     Patricia p{};
 
-    while(std::cin >> cmd) {
+    while(std::cin >> input) {
         bool catched = false;
-        if (cmd == "+") {
+        if (input == "+") {
             uint64_t value;
             std::string key;
             // Read key and value
@@ -25,13 +26,13 @@ int main() {
                 p.add(key, value);
             } catch(std::runtime_error& ex) {
                 catched = true;
-                std::cout << "Exists" << '\n';
+                std::cout << "Exist" << '\n';
             }
 
             if (!catched) {
                 std::cout << "OK" << '\n';
             }
-        } else if (cmd == "-") {
+        } else if (input == "-") {
             // Read key
             std::string key;
             std::cin >> key;
@@ -48,11 +49,25 @@ int main() {
             if (!catched) {
                 std::cout << "OK" << '\n';
             }
+        } else if (input == "!") {
+            std::string cmd, path;
+            std::cin >> cmd >> path;
+            if (cmd == "Save") {
+                std::ofstream f;
+                f.open(path, std::ios::trunc | std::ios::out | std::ios::binary);
+                p.save(f);
+                std::cout << "OK" << '\n';
+            } else {
+                std::ifstream f;
+                f.open(path, std::ios::binary | std::ios::in);
+                p.load(f);
+                std::cout << "OK" << '\n';
+            }
         } else {
             uint64_t value;
-            to_lower_case(cmd);
+            to_lower_case(input);
             try {
-                value = p.at(cmd);
+                value = p.at(input);
             }
             catch(std::runtime_error& ex) {
                 catched = true;
@@ -63,5 +78,7 @@ int main() {
                 std::cout << "OK: " << value << '\n';
             }
         }
+//        std::cout << p << std::endl;
+
     }
 }
