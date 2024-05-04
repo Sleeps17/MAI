@@ -18,7 +18,7 @@ inline MyVector<Data> CountSort(const MyVector<Data>& objects) {
     MyVector<uint64_t> count(MaxKey + 1, 0);
     MyVector<Data> result(objects.length());
 
-    for (const auto&[key, value] : objects) {
+    for (const auto&[key, _ ] : objects) {
         ++count[key];
     }
 

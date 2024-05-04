@@ -26,7 +26,7 @@ uint64_t RandomValue() {
     return static_cast<uint64_t>(std::uniform_int_distribution<uint64_t>(0, MaxValue)(gen));
 }
 
-TEST(CountSortTest, SortedDataTest) {
+TEST(CountSortTest, SortDataTest) {
     MyVector<Data> objects;
 
 for (int i = 0; i < 1000; ++i) {
@@ -39,6 +39,6 @@ for (int i = 0; i < 1000; ++i) {
 }
 
 int main(int argc, char** argv) {
-    ::testing::InitGoogleTest(&argc, argv);
+    testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
