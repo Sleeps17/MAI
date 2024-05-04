@@ -1,7 +1,38 @@
-#include "patricia.hpp"
-#include <cstring>
 #include <iostream>
 #include <fstream>
+#include <utility>
+#include <cstring>
+#include <cstdint>
+
+
+class Patricia {
+private:
+    struct Node;
+    Node* root;
+    size_t elements_count;
+
+    static const size_t bit_count = 5;
+
+    [[nodiscard]] Node* search(const std::string& findKey) const;
+    void insert(const std::string& key, const uint64_t& value, const size_t& index);
+    [[nodiscard]] Node** triple_search(const std::string& findKey) const;
+    void clear_node(Node* node);
+    void count_elements(Node* root, Node* arr[], int64_t& priority) const;
+    void print(std::ostream& os, Node* node, const size_t& prev_index) const;
+
+public:
+    void add(const std::string& key, const uint64_t& value);
+    void erase(const std::string& key);
+    [[nodiscard]] uint64_t at(const std::string& key) const;
+    void clear();
+
+    void save(std::ofstream& f) const;
+    void load(std::ifstream& f);
+
+    friend std::ostream& operator<<(std::ostream& os, const Patricia& tree);
+
+    ~Patricia();
+};
 
 struct Patricia::Node {
     std::string key{};
@@ -173,8 +204,8 @@ void Patricia::clear() {
     }
 
     delete root;
-    elements_count = 0;
     root = nullptr;
+    elements_count = 0;
 }
 
 Patricia::~Patricia() {
@@ -184,30 +215,32 @@ Patricia::~Patricia() {
 void Patricia::save(std::ofstream& f) const {
     f.write(reinterpret_cast<const char*>(&elements_count), sizeof(size_t));
 
-    Node* arr[elements_count+1];
-    int64_t priority = 0;
-    count_elements(root, arr, priority);
+    if (elements_count > 0) {
+        Node* arr[elements_count];
+        int64_t priority = 0;
+        count_elements(root, arr, priority);
 
-    for (size_t i = 0; i <= elements_count; ++i) {
-        f.write(reinterpret_cast<const char*>(&arr[i]->value), sizeof(int64_t));
-        f.write(reinterpret_cast<const char*>(&arr[i]->index), sizeof(size_t));
-        size_t length = 0;
-        if (arr[i] != nullptr) {
-            length = arr[i]->key.length();
-        }
+        for (size_t i = 0; i < elements_count; ++i) {
+            f.write(reinterpret_cast<const char*>(&arr[i]->value), sizeof(int64_t));
+            f.write(reinterpret_cast<const char*>(&arr[i]->index), sizeof(size_t));
+            size_t length = 0;
+            if (arr[i] != nullptr) {
+                length = arr[i]->key.length();
+            }
 
-        f.write(reinterpret_cast<const char*>(&length), sizeof(size_t));
-        f.write(arr[i]->key.c_str(), long(length*sizeof(char)));
-        size_t left_priority = -1;
-        if (arr[i] != nullptr && arr[i]->left != nullptr) {
-            left_priority = arr[i]->left->priority;
+            f.write(reinterpret_cast<const char*>(&length), sizeof(size_t));
+            f.write(arr[i]->key.c_str(), long(length*sizeof(char)));
+            int64_t left_priority = -1;
+            if (arr[i] != nullptr && arr[i]->left != nullptr) {
+                left_priority = arr[i]->left->priority;
+            }
+            f.write(reinterpret_cast<const char*>(&left_priority), sizeof(size_t));
+            int64_t right_priority = -1;
+            if (arr[i] != nullptr && arr[i]->right != nullptr) {
+                right_priority = arr[i]->right->priority;
+            }
+            f.write(reinterpret_cast<const char*>(&right_priority), sizeof(size_t));
         }
-        f.write(reinterpret_cast<const char*>(&left_priority), sizeof(size_t));
-        size_t right_priority = -1;
-        if (arr[i] != nullptr && arr[i]->right != nullptr) {
-            right_priority = arr[i]->right->priority;
-        }
-        f.write(reinterpret_cast<const char*>(&right_priority), sizeof(size_t));
     }
 }
 
@@ -223,7 +256,13 @@ void Patricia::load(std::ifstream& f) {
 
     elements_count = count;
 
+    root = new Node();
     Node* arr[elements_count];
+    arr[0] = root;
+    for (size_t i = 1; i < elements_count; ++i) {
+        arr[i] = new Node();
+    }
+
     std::string key;
     size_t value, index, length;
     int64_t left_priority = -1, right_priority = -1;
@@ -232,13 +271,11 @@ void Patricia::load(std::ifstream& f) {
         f.read(reinterpret_cast<char*>(&index), sizeof(size_t));
         f.read(reinterpret_cast<char*>(&length), sizeof(size_t));
         key.resize(length);
-        f.read(key.data(), long(length*sizeof(char)));
+        f.read(const_cast<char*>(key.data()), long(length*sizeof(char)));
         f.read(reinterpret_cast<char*>(&left_priority), sizeof(size_t));
         f.read(reinterpret_cast<char*>(&right_priority), sizeof(size_t));
-        arr[i] = new Node(key, value, index, left_priority >= 0 ? arr[left_priority] : nullptr, right_priority >= 0 ? arr[right_priority] : nullptr);
+        *arr[i] = Node(key, value, index, left_priority >= 0 ? arr[left_priority] : nullptr, right_priority >= 0 ? arr[right_priority] : nullptr);
     }
-
-    root = arr[0];
 }
 
 std::ostream &operator<<(std::ostream &os, const Patricia &tree) {
@@ -392,4 +429,84 @@ void Patricia::print(std::ostream& os, Patricia::Node *node, const size_t &prev_
     os << '\t'  << "[ " << node->index << ' ' << node->key << ' ' << node->value << " ]" << '\n';
     print(os, node->left, node->index);
     print(os, node->right, node->index);
+}
+
+void to_lower_case(std::string& str) {
+    for(int i = 0; i < str.length(); i++) {
+        str[i] = (char)tolower(str[i]);
+    }
+}
+
+int main() {
+    std::string input;
+    Patricia p{};
+
+    while(std::cin >> input) {
+        bool catched = false;
+        if (input == "+") {
+            uint64_t value;
+            std::string key;
+            // Read key and value
+            std::cin >> key >> value;
+            // Transform key to lower case
+            to_lower_case(key);
+            // Add word
+            try {
+                p.add(key, value);
+            } catch(std::runtime_error& ex) {
+                catched = true;
+                std::cout << "Exist" << '\n';
+            }
+
+            if (!catched) {
+                std::cout << "OK" << '\n';
+            }
+        } else if (input == "-") {
+            // Read key
+            std::string key;
+            std::cin >> key;
+            // Transform key to lower case
+            to_lower_case(key);
+            // Delete word
+            try {
+                p.erase(key);
+            } catch (std::runtime_error& ex) {
+                catched = true;
+                std::cout << "NoSuchWord" << '\n';
+            }
+
+            if (!catched) {
+                std::cout << "OK" << '\n';
+            }
+        } else if (input == "!") {
+            std::string cmd, path;
+            std::cin >> cmd >> path;
+            if (cmd == "Save") {
+                std::ofstream f;
+                f.open(path, std::ios::trunc | std::ios::out | std::ios::binary);
+                p.save(f);
+                std::cout << "OK" << '\n';
+            } else {
+                std::ifstream f;
+                f.open(path, std::ios::binary | std::ios::in);
+                p.load(f);
+                std::cout << "OK" << '\n';
+            }
+        } else {
+            uint64_t value;
+            to_lower_case(input);
+            try {
+                value = p.at(input);
+            }
+            catch(std::runtime_error& ex) {
+                catched = true;
+                std::cout << "NoSuchWord" << '\n';
+            }
+
+            if (!catched) {
+                std::cout << "OK: " << value << '\n';
+            }
+        }
+//        std::cout << p << std::endl;
+    }
 }
