@@ -4,7 +4,6 @@
 #include <cstring>
 #include <cstdint>
 
-
 class Patricia {
 private:
     struct Node;
