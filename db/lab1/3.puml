@@ -1,0 +1,36 @@
+@startuml Autopark
+title Автопарк
+
+entity "Cars" as cars {
+    * car_id : int <<PK>>
+    --
+    brand : varchar
+    model : varchar
+    year : int
+    driver_license : varchar
+    availability : boolean
+}
+
+entity "Customers" as customers {
+    * customer_id : int <<PK>>
+    --
+    first_name : varchar
+    last_name : varchar
+    driver_license : varchar
+    contact_info : varchar
+}
+
+entity "Rentals" as rentals {
+    * rental_id : int <<PK>>
+    --
+    start_date : date
+    end_date : date
+    --
+    customer_id : int <<FK>> -- Customers.customer_id
+    car_id : int <<FK>> -- Cars.car_id
+}
+
+customers ||--o{ rentals : "rents"
+cars ||--o{ rentals : "is rented by"
+
+@enduml

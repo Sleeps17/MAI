@@ -1,0 +1,36 @@
+@startuml Clinic
+title Стоматологическая клиника
+
+entity "Patients" as patients {
+    * patient_id : int <<PK>>
+    --
+    first_name : varchar
+    last_name : varchar
+    date_of_birth : date
+    contact_info : varchar
+}
+
+entity "Doctors" as doctors {
+    * doctor_id : int <<PK>>
+    --
+    first_name : varchar
+    last_name : varchar
+    specialty : varchar
+    contact_info : varchar
+}
+
+entity "Appointments" as appointments {
+    * appointment_id : int <<PK>>
+    --
+    appointment_date : date
+    appointment_time : time
+    description : text
+    --
+    patient_id : int <<FK>> -- Patients.patient_id
+    doctor_id : int <<FK>> -- Doctors.doctor_id
+}
+
+patients ||--o{ appointments : "has"
+doctors ||--o{ appointments : "conducts"
+
+@enduml
