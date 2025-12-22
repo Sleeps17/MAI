@@ -43,12 +43,10 @@ def solve_ADI(I, J, K):
     print("\nМЕТОД ПЕРЕМЕННЫХ НАПРАВЛЕНИЙ (ADI)")
     print(f"Сетка: {I}×{J} точек, {K} шагов по времени")
 
-    # Шаги сетки
     hx = Lx / I
     hy = Ly / J
     tau = T_final / K
 
-    # Координаты сетки
     x = np.linspace(0, Lx, I + 1)
     y = np.linspace(0, Ly, J + 1)
     t = np.linspace(0, T_final, K + 1)
@@ -60,53 +58,42 @@ def solve_ADI(I, J, K):
             u[i, j, 0] = np.cos(2 * x[i]) * np.cosh(y[j])
 
     for k in range(K + 1):
-        current_time = t[k]
-
-        # Левая граница: u(0, y, t) = cosh(y) * exp(-3at)
-        for j in range(J + 1):
-            u[0, j, k] = np.cosh(y[j]) * np.exp(-3 * a * current_time)
-
-        # Правая граница: u(π/4, y, t) = 0
-        u[I, :, k] = 0
-
-        # Нижняя граница: u(x, 0, t) = cos(2x) * exp(-3at)
-        for i in range(I + 1):
-            u[i, 0, k] = np.cos(2 * x[i]) * np.exp(-3 * a * current_time)
+        tk = t[k]
+        exp_factor = np.exp(-3 * a * tk)
+        u[0, :, k] = np.cosh(y) * exp_factor
+        u[I, :, k] = 0.0
+        u[:, 0, k] = np.cos(2 * x) * exp_factor
 
     sigma_x = a * tau / (2 * hx**2)
     sigma_y = a * tau / (2 * hy**2)
 
     u_star = np.zeros((I + 1, J + 1))
 
-    # 3. ИТЕРАЦИОННЫЙ ПРОЦЕСС
     start_time = time.time()
 
     for k in range(K):
-        current_time = t[k]
-        next_time = t[k + 1]
+        t_mid = t[k] + tau / 2
+        t_next = t[k + 1]
+        exp_mid = np.exp(-3 * a * t_mid)
+        exp_next = np.exp(-3 * a * t_next)
 
-        # ========== ПЕРВЫЙ ПОЛУШАГ (неявный по x, явный по y) ==========
+        # === ПЕРВЫЙ ПОЛУШАГ: неявно по x, явно по y ===
         for j in range(1, J):
-            n = I + 1
-            A = np.zeros(n)
-            B = np.zeros(n)
-            C = np.zeros(n)
-            D = np.zeros(n)
+            A = np.zeros(I + 1)
+            B = np.zeros(I + 1)
+            C = np.zeros(I + 1)
+            D = np.zeros(I + 1)
 
             for i in range(I + 1):
                 if i == 0:
-                    A[i] = 0
-                    B[i] = 1
-                    C[i] = 0
-                    D[i] = np.cosh(y[j]) * np.exp(-3 * a * (current_time + tau / 2))
+                    B[i] = 1.0
+                    D[i] = np.cosh(y[j]) * exp_mid
                 elif i == I:
-                    A[i] = 0
-                    B[i] = 1
-                    C[i] = 0
-                    D[i] = 0
+                    B[i] = 1.0
+                    D[i] = 0.0
                 else:
                     A[i] = -sigma_x
-                    B[i] = 1 + 2 * sigma_x
+                    B[i] = 1.0 + 2 * sigma_x
                     C[i] = -sigma_x
                     D[i] = (
                         sigma_y * u[i, j + 1, k]
@@ -116,35 +103,27 @@ def solve_ADI(I, J, K):
 
             u_star[:, j] = thomas_algorithm(A, B, C, D)
 
-        for i in range(I + 1):
-            u_star[i, 0] = np.cos(2 * x[i]) * np.exp(-3 * a * (current_time + tau / 2))
+        u_star[:, 0] = np.cos(2 * x) * exp_mid
 
-            u_star[i, J] = u_star[i, J - 2] + 2 * hy * 0.75 * np.cos(2 * x[i]) * np.exp(
-                -3 * a * (current_time + tau / 2)
-            )
-
-        # ========== ВТОРОЙ ПОЛУШАГ (явный по x, неявный по y) ==========
-        for i in range(1, I):
-            n = J + 1
-            A = np.zeros(n)
-            B = np.zeros(n)
-            C = np.zeros(n)
-            D = np.zeros(n)
+        # === ВТОРОЙ ПОЛУШАГ: явно по x, неявно по y ===
+        for i in range(1, I):  # внутренние узлы по x
+            A = np.zeros(J + 1)
+            B = np.zeros(J + 1)
+            C = np.zeros(J + 1)
+            D = np.zeros(J + 1)
 
             for j in range(J + 1):
                 if j == 0:
-                    A[j] = 0
-                    B[j] = 1
-                    C[j] = 0
-                    D[j] = np.cos(2 * x[i]) * np.exp(-3 * a * next_time)
+                    B[j] = 1.0
+                    D[j] = np.cos(2 * x[i]) * exp_next
                 elif j == J:
-                    A[j] = 1
-                    B[j] = -4
-                    C[j] = 3
-                    D[j] = 2 * hy * 0.75 * np.cos(2 * x[i]) * np.exp(-3 * a * next_time)
+                    B[j] = 3.0
+                    A[j] = -3.0
+                    C[j] = 0.0
+                    D[j] = -hy * np.cos(2 * x[i]) * exp_next
                 else:
                     A[j] = -sigma_y
-                    B[j] = 1 + 2 * sigma_y
+                    B[j] = 1.0 + 2 * sigma_y
                     C[j] = -sigma_y
                     D[j] = (
                         sigma_x * u_star[i + 1, j]
@@ -154,43 +133,42 @@ def solve_ADI(I, J, K):
 
             u[i, :, k + 1] = thomas_algorithm(A, B, C, D)
 
+        # Устанавливаем граничные значения по x для нового временного слоя
+        u[0, :, k + 1] = np.cosh(y) * exp_next
+        u[I, :, k + 1] = 0.0
+
     computation_time = time.time() - start_time
     print(f"Время вычислений: {computation_time:.3f} сек")
 
     return x, y, t, u
 
 
-# ================= МЕТОД ДРОБНЫХ ШАГОВ =================
 def solve_fractional_steps(I, J, K):
     print("\nМЕТОД ДРОБНЫХ ШАГОВ")
     print(f"Сетка: {I}×{J} точек, {K} шагов по времени")
 
-    # Шаги сетки
     hx = Lx / I
     hy = Ly / J
     tau = T_final / K
 
-    # Координаты сетки
     x = np.linspace(0, Lx, I + 1)
     y = np.linspace(0, Ly, J + 1)
     t = np.linspace(0, T_final, K + 1)
 
     u = np.zeros((I + 1, J + 1, K + 1))
 
+    # Начальное условие
     for i in range(I + 1):
         for j in range(J + 1):
             u[i, j, 0] = np.cos(2 * x[i]) * np.cosh(y[j])
 
+    # Установим граничные условия первого рода на всех временных слоях
     for k in range(K + 1):
-        current_time = t[k]
-
-        for j in range(J + 1):
-            u[0, j, k] = np.cosh(y[j]) * np.exp(-3 * a * current_time)
-
-        u[I, :, k] = 0
-
-        for i in range(I + 1):
-            u[i, 0, k] = np.cos(2 * x[i]) * np.exp(-3 * a * current_time)
+        tk = t[k]
+        exp_factor = np.exp(-3 * a * tk)
+        u[0, :, k] = np.cosh(y) * exp_factor  # x = 0
+        u[I, :, k] = 0.0  # x = pi/4
+        u[:, 0, k] = np.cos(2 * x) * exp_factor  # y = 0
 
     sigma_x = a * tau / hx**2
     sigma_y = a * tau / hy**2
@@ -198,78 +176,63 @@ def solve_fractional_steps(I, J, K):
     start_time = time.time()
 
     for k in range(K):
-        current_time = t[k]
-        next_time = t[k + 1]
+        t_next = t[k + 1]
+        exp_next = np.exp(-3 * a * t_next)
 
         u_star = np.zeros((I + 1, J + 1))
 
-        # ========== ПЕРВЫЙ ШАГ: только оператор по x ==========
-        for j in range(1, J):
-            n = I + 1
-            A = np.zeros(n)
-            B = np.zeros(n)
-            C = np.zeros(n)
-            D = np.zeros(n)
+        # === ПЕРВЫЙ ШАГ: неявно по x (оператор Lx) ===
+        for j in range(1, J):  # внутренние узлы по y
+            A = np.zeros(I + 1)
+            B = np.zeros(I + 1)
+            C = np.zeros(I + 1)
+            D = np.zeros(I + 1)
 
             for i in range(I + 1):
                 if i == 0:
-                    A[i] = 0
-                    B[i] = 1
-                    C[i] = 0
-                    D[i] = np.cosh(y[j]) * np.exp(-3 * a * next_time)
+                    B[i] = 1.0
+                    D[i] = np.cosh(y[j]) * exp_next
                 elif i == I:
-                    A[i] = 0
-                    B[i] = 1
-                    C[i] = 0
-                    D[i] = 0
+                    B[i] = 1.0
+                    D[i] = 0.0
                 else:
-                    A[i] = -sigma_x / 2
-                    B[i] = 1 + sigma_x
-                    C[i] = -sigma_x / 2
-                    D[i] = (
-                        (sigma_x / 2) * u[i - 1, j, k]
-                        + (1 - sigma_x) * u[i, j, k]
-                        + (sigma_x / 2) * u[i + 1, j, k]
-                    )
+                    A[i] = -sigma_x
+                    B[i] = 1.0 + 2 * sigma_x
+                    C[i] = -sigma_x
+                    D[i] = u[i, j, k]
 
             u_star[:, j] = thomas_algorithm(A, B, C, D)
 
-        for i in range(I + 1):
-            u_star[i, 0] = np.cos(2 * x[i]) * np.exp(-3 * a * next_time)
-            u_star[i, J] = u_star[i, J - 2] + 2 * hy * 0.75 * np.cos(2 * x[i]) * np.exp(
-                -3 * a * next_time
-            )
+        u_star[0, :] = np.cosh(y) * exp_next
+        u_star[I, :] = 0.0  # x = pi/4
 
-        # ========== ВТОРОЙ ШАГ: только оператор по y ==========
+        u_star[:, 0] = np.cos(2 * x) * exp_next
+
         for i in range(1, I):
-            n = J + 1
-            A = np.zeros(n)
-            B = np.zeros(n)
-            C = np.zeros(n)
-            D = np.zeros(n)
+            A = np.zeros(J + 1)
+            B = np.zeros(J + 1)
+            C = np.zeros(J + 1)
+            D = np.zeros(J + 1)
 
             for j in range(J + 1):
                 if j == 0:
-                    A[j] = 0
-                    B[j] = 1
-                    C[j] = 0
-                    D[j] = np.cos(2 * x[i]) * np.exp(-3 * a * next_time)
+                    B[j] = 1.0
+                    D[j] = np.cos(2 * x[i]) * exp_next
                 elif j == J:
-                    A[j] = 1
-                    B[j] = -4
-                    C[j] = 3
-                    D[j] = 2 * hy * 0.75 * np.cos(2 * x[i]) * np.exp(-3 * a * next_time)
+                    B[j] = 3.0
+                    A[j] = -3.0
+                    C[j] = 0.0
+                    D[j] = -hy * np.cos(2 * x[i]) * exp_next
                 else:
-                    A[j] = -sigma_y / 2
-                    B[j] = 1 + sigma_y
-                    C[j] = -sigma_y / 2
-                    D[j] = (
-                        (sigma_y / 2) * u_star[i, j - 1]
-                        + (1 - sigma_y) * u_star[i, j]
-                        + (sigma_y / 2) * u_star[i, j + 1]
-                    )
+                    A[j] = -sigma_y
+                    B[j] = 1.0 + 2 * sigma_y
+                    C[j] = -sigma_y
+                    D[j] = u_star[i, j]  # Явный член: u^*
 
             u[i, :, k + 1] = thomas_algorithm(A, B, C, D)
+
+        u[0, :, k + 1] = np.cosh(y) * exp_next
+        u[I, :, k + 1] = 0.0
 
     computation_time = time.time() - start_time
     print(f"Время вычислений: {computation_time:.3f} сек")
@@ -395,7 +358,6 @@ def plot_error_vs_step(
     return np.array(hs), np.array(errors)
 
 
-# ================= ОСНОВНАЯ ПРОГРАММА =================
 def main():
     I = 40
     J = 40
