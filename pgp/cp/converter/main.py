@@ -2,7 +2,7 @@ import numpy as np
 import imageio.v2 as imageio
 import os
 
-W, H = 320, 240
+W, H = 1920, 1080
 os.makedirs("../png", exist_ok=True)
 
 for i in range(60):
