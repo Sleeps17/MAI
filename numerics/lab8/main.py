@@ -143,7 +143,7 @@ def solve_ADI(I, J, K):
     return x, y, t, u
 
 
-def solve_fractional_steps(I, J, K):
+def solve_FS(I, J, K):
     print("\nМЕТОД ДРОБНЫХ ШАГОВ")
     print(f"Сетка: {I}×{J} точек, {K} шагов по времени")
 
@@ -324,7 +324,7 @@ def plot_error_vs_step(
         if method == "ADI":
             x, y, t, u = solve_ADI(I, J, K)
         elif method == "FS":
-            x, y, t, u = solve_fractional_steps(I, J, K)
+            x, y, t, u = solve_FS(I, J, K)
         else:
             raise ValueError("method должен быть 'ADI' или 'FS'")
 
@@ -376,7 +376,7 @@ def main():
     x, y, t, u_ADI = solve_ADI(I, J, K)
 
     # 2. РЕШЕНИЕ МЕТОДОМ ДРОБНЫХ ШАГОВ
-    x, y, t, u_FS = solve_fractional_steps(I, J, K)
+    x, y, t, u_FS = solve_FS(I, J, K)
 
     # 3. ГРАФИКИ
     plot_3d_solution_and_error(x, y, t, u_ADI, method_name="ADI")
