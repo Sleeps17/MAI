@@ -208,6 +208,7 @@ def solve_FS(I, J, K):
 
         u_star[:, 0] = np.cos(2 * x) * exp_next
 
+        # === ПЕРВЫЙ ШАГ: неявно по y (оператор Ly) ===
         for i in range(1, I):
             A = np.zeros(J + 1)
             B = np.zeros(J + 1)
